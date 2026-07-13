@@ -1,0 +1,150 @@
+"use client";
+
+import { useMemo } from "react";
+import { catalog } from "../data/catalog";
+
+type Cart = Record<string, number>;
+
+type Props = {
+  cart: Cart;
+  setCart: React.Dispatch<React.SetStateAction<Cart>>;
+  onContinue: () => void;
+};
+
+export default function OrderScreen({
+  cart,
+  setCart,
+  onContinue,
+}: Props) {
+
+  function add(product: string) {
+    setCart((prev) => ({
+      ...prev,
+      [product]: (prev[product] || 0) + 1,
+    }));
+  }
+
+  function remove(product: string) {
+    setCart((prev) => {
+      const next = { ...prev };
+
+      if (!next[product]) return prev;
+
+      if (next[product] === 1) {
+        delete next[product];
+      } else {
+        next[product]--;
+      }
+
+      return next;
+    });
+  }
+
+  const totalBoxes = useMemo(
+    () => Object.values(cart).reduce((a, b) => a + b, 0),
+    [cart]
+  );
+
+  const totalUnits = useMemo(() => {
+    let total = 0;
+
+    catalog.forEach((category) => {
+      category.products.forEach((product) => {
+        total += (cart[product] || 0) * category.unitsPerBox;
+      });
+    });
+
+    return total;
+  }, [cart]);
+
+  return (
+    <main className="min-h-screen bg-gray-100 pb-32">
+      <div className="mx-auto max-w-md p-5">
+
+        <h1 className="text-3xl font-bold text-center">
+          Nuevo pedido
+        </h1>
+
+        <p className="text-center text-gray-500 mt-2 mb-8">
+          Pedido mínimo: 3 cajas
+        </p>
+
+        {catalog.map((category) => (
+          <div key={category.id} className="mb-10">
+
+            <h2 className="text-xl font-bold mb-4">
+              {category.title}
+            </h2>
+
+            <div className="space-y-3">
+
+              {category.products.map((product) => (
+                <div
+                  key={product}
+                  className="rounded-xl bg-white shadow p-4 flex items-center justify-between"
+                >
+
+                  <div className="font-medium">
+                    {product}
+                  </div>
+
+                  <div className="flex items-center gap-3">
+
+                    <button
+                      onClick={() => remove(product)}
+                      className="w-8 h-8 rounded-full bg-gray-200"
+                    >
+                      -
+                    </button>
+
+                    <div className="text-center min-w-[70px]">
+                      <div className="font-semibold">
+                        {cart[product] || 0}
+                      </div>
+
+                      <div className="text-xs text-gray-500">
+                        {(cart[product] || 0) * category.unitsPerBox} uds
+                      </div>
+                    </div>
+
+                    <button
+                      onClick={() => add(product)}
+                      className="w-8 h-8 rounded-full bg-black text-white"
+                    >
+                      +
+                    </button>
+
+                  </div>
+
+                </div>
+              ))}
+
+            </div>
+
+          </div>
+        ))}
+
+      </div>
+
+      <div className="fixed bottom-0 left-0 right-0 bg-white border-t p-4">
+
+        <div className="mx-auto max-w-md">
+
+          <button
+            onClick={onContinue}
+            disabled={totalBoxes < 3}
+            className={`w-full rounded-xl py-4 font-semibold text-white ${
+              totalBoxes >= 3 ? "bg-black" : "bg-gray-400"
+            }`}
+          >
+            {totalBoxes < 3
+              ? `Añade ${3 - totalBoxes} caja${3 - totalBoxes > 1 ? "s" : ""} más`
+              : `Continuar pedido (${totalBoxes} cajas · ${totalUnits} unidades)`}
+          </button>
+
+        </div>
+
+      </div>
+    </main>
+  );
+}
