@@ -27,10 +27,11 @@ export default function SummaryScreen({ cart, onBack }: Props) {
       return;
     }
 
-    let message = "🛒 *NUEVO PEDIDO AMÁS VAPER*%0A%0A";
+    let totalUnitsMessage = 0;
 
-    message += `🏪 *Establecimiento:* ${shopName}%0A`;
-    message += `📍 *Localidad:* ${city}%0A%0A`;
+    let message = `*${shopName.toUpperCase()}*%0A`;
+    message += `${city}%0A%0A`;
+    message += "━━━━━━━━━━━━━━%0A%0A";
 
     catalog.forEach((category) => {
       const products = category.products.filter(
@@ -39,13 +40,15 @@ export default function SummaryScreen({ cart, onBack }: Props) {
 
       if (products.length === 0) return;
 
-      message += `📦 *${category.title}*%0A`;
+      message += `📦 *${category.title}*%0A%0A`;
 
       products.forEach((product) => {
         const boxes = cart[product];
         const units = boxes * category.unitsPerBox;
 
-        message += `• ${product}: ${boxes} ${
+        totalUnitsMessage += units;
+
+        message += `• ${product} × ${boxes} ${
           boxes === 1 ? "caja" : "cajas"
         } (${units} uds)%0A`;
       });
@@ -53,8 +56,8 @@ export default function SummaryScreen({ cart, onBack }: Props) {
       message += "%0A";
     });
 
-    message += "━━━━━━━━━━━━━━%0A";
-    message += `📦 *TOTAL:* ${totalBoxes} cajas · ${totalUnits} unidades`;
+    message += "━━━━━━━━━━━━━━%0A%0A";
+    message += `📦 *TOTAL:* ${totalBoxes} cajas · ${totalUnitsMessage} unidades`;
 
     window.open(
       `https://wa.me/34744787695?text=${message}`,
