@@ -1,9 +1,16 @@
 "use client";
 
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { catalog } from "../data/catalog";
 
 type Cart = Record<string, number>;
+
+type StockProduct = {
+  producto: string;
+  categoria: string;
+  stock: number;
+  visible: boolean;
+};
 
 type Props = {
   cart: Cart;
@@ -16,6 +23,21 @@ export default function OrderScreen({
   setCart,
   onContinue,
 }: Props) {
+  const [stock, setStock] = useState<StockProduct[]>([]);
+
+  useEffect(() => {
+    async function loadStock() {
+      const res = await fetch("/api/stock");
+      const data = await res.json();
+      setStock(data);
+    }
+
+    loadStock();
+  }, []);
+
+  function getProductStock(product: string) {
+    return stock.find((p) => p.producto === product);
+  }
 
   function add(product: string) {
     setCart((prev) => ({
@@ -60,7 +82,6 @@ export default function OrderScreen({
   return (
     <main className="min-h-screen bg-gray-100 pb-32">
       <div className="mx-auto max-w-md p-5">
-
         <h1 className="text-3xl font-bold text-center">
           Nuevo pedido
         </h1>
@@ -71,65 +92,66 @@ export default function OrderScreen({
 
         {catalog.map((category) => (
           <div key={category.id} className="mb-10">
-
             <h2 className="text-xl font-bold mb-4">
               {category.title}
             </h2>
 
             <div className="space-y-3">
+              {category.products.map((product) => {
+                const productStock = getProductStock(product);
 
-              {category.products.map((product) => (
-                <div
-                  key={product}
-                  className="rounded-xl bg-white shadow p-4 flex items-center justify-between"
-                >
-
-                  <div className="font-medium">
-                    {product}
-                  </div>
-
-                  <div className="flex items-center gap-3">
-
-                    <button
-                      onClick={() => remove(product)}
-                      className="w-8 h-8 rounded-full bg-gray-200"
-                    >
-                      -
-                    </button>
-
-                    <div className="text-center min-w-[70px]">
-                      <div className="font-semibold">
-                        {cart[product] || 0}
+                return (
+                  <div
+                    key={product}
+                    className="rounded-xl bg-white shadow p-4 flex items-center justify-between"
+                  >
+                    <div>
+                      <div className="font-medium">
+                        {product}
                       </div>
 
-                      <div className="text-xs text-gray-500">
-                        {(cart[product] || 0) * category.unitsPerBox} uds
-                      </div>
+                      {productStock && productStock.stock === 0 && (
+                        <p className="text-sm text-red-600 font-semibold mt-1">
+                          Stock no disponible
+                        </p>
+                      )}
                     </div>
 
-                    <button
-                      onClick={() => add(product)}
-                      className="w-8 h-8 rounded-full bg-black text-white"
-                    >
-                      +
-                    </button>
+                    <div className="flex items-center gap-3">
+                      <button
+                        onClick={() => remove(product)}
+                        className="w-8 h-8 rounded-full bg-gray-200"
+                      >
+                        -
+                      </button>
 
+                      <div className="text-center min-w-[70px]">
+                        <div className="font-semibold">
+                          {cart[product] || 0}
+                        </div>
+
+                        <div className="text-xs text-gray-500">
+                          {(cart[product] || 0) * category.unitsPerBox} uds
+                        </div>
+                      </div>
+
+                      <button
+                        onClick={() => add(product)}
+                        className="w-8 h-8 rounded-full bg-black text-white"
+                      >
+                        +
+                      </button>
+                    </div>
                   </div>
-
-                </div>
-              ))}
-
+                );
+              })}
             </div>
-
           </div>
         ))}
-
       </div>
 
       <div className="fixed bottom-0 left-0 right-0 bg-white border-t p-4">
-
         <div className="mx-auto max-w-md">
-
           <button
             onClick={onContinue}
             disabled={totalBoxes < 3}
@@ -138,12 +160,12 @@ export default function OrderScreen({
             }`}
           >
             {totalBoxes < 3
-              ? `Añade ${3 - totalBoxes} caja${3 - totalBoxes > 1 ? "s" : ""} más`
+              ? `Añade ${3 - totalBoxes} caja${
+                  3 - totalBoxes > 1 ? "s" : ""
+                } más`
               : `Continuar pedido (${totalBoxes} cajas · ${totalUnits} unidades)`}
           </button>
-
         </div>
-
       </div>
     </main>
   );
