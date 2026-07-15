@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { catalog } from "../data/catalog";
+import { normalizeName } from "../lib/normalize";
 
 type Cart = Record<string, number>;
 
@@ -36,7 +37,9 @@ export default function OrderScreen({
   }, []);
 
   function getProductStock(product: string) {
-    return stock.find((p) => p.producto === product);
+    return stock.find(
+      (p) => normalizeName(p.producto) === normalizeName(product)
+    );
   }
 
   function add(product: string) {
@@ -55,7 +58,7 @@ export default function OrderScreen({
       if (next[product] === 1) {
         delete next[product];
       } else {
-        next[product]--;
+        next[product] -= 1;
       }
 
       return next;
@@ -99,6 +102,16 @@ export default function OrderScreen({
             <div className="space-y-3">
               {category.products.map((product) => {
                 const productStock = getProductStock(product);
+                const sinStock = productStock?.stock === 0;
+
+                const maxBoxes =
+                  productStock !== undefined
+                    ? Math.floor(productStock.stock / category.unitsPerBox)
+                    : undefined;
+
+                const limiteAlcanzado =
+                  maxBoxes !== undefined &&
+                  (cart[product] || 0) >= maxBoxes;
 
                 return (
                   <div
@@ -137,7 +150,12 @@ export default function OrderScreen({
 
                       <button
                         onClick={() => add(product)}
-                        className="w-8 h-8 rounded-full bg-black text-white"
+                        disabled={sinStock || limiteAlcanzado}
+                        className={`w-8 h-8 rounded-full text-white ${
+                          sinStock || limiteAlcanzado
+                            ? "bg-gray-300"
+                            : "bg-black"
+                        }`}
                       >
                         +
                       </button>
