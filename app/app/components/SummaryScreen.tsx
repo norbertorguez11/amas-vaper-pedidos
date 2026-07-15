@@ -6,9 +6,10 @@ import { catalog } from "../data/catalog";
 type Props = {
   cart: Record<string, number>;
   onBack: () => void;
+  onOrderSent: () => void;
 };
 
-export default function SummaryScreen({ cart, onBack }: Props) {
+export default function SummaryScreen({ cart, onBack, onOrderSent }: Props) {
   const [shopName, setShopName] = useState("");
   const [city, setCity] = useState("");
   const [sending, setSending] = useState(false);
@@ -86,6 +87,8 @@ export default function SummaryScreen({ cart, onBack }: Props) {
       `https://wa.me/34744787695?text=${message}`,
       "_blank"
     );
+
+    onOrderSent();
   }
 
   return (
