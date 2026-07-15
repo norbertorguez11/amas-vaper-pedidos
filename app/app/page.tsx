@@ -8,7 +8,9 @@ import SummaryScreen from "./components/SummaryScreen";
 export type Cart = Record<string, number>;
 
 const CART_KEY = "amas_vaper_cart";
+const CART_TIMESTAMP_KEY = "amas_vaper_cart_timestamp";
 const ORDER_SENT_KEY = "amas_vaper_order_sent";
+const CART_EXPIRATION_MS = 20 * 60 * 1000; // 20 minutos
 
 export default function Home() {
   const [started, setStarted] = useState(false);
@@ -18,11 +20,20 @@ export default function Home() {
 
   useEffect(() => {
     const savedCart = localStorage.getItem(CART_KEY);
-    if (savedCart) {
-      try {
-        setCart(JSON.parse(savedCart));
-      } catch {
-        // si el dato guardado estuviera corrupto, lo ignoramos
+    const savedTimestamp = localStorage.getItem(CART_TIMESTAMP_KEY);
+
+    if (savedCart && savedTimestamp) {
+      const elapsed = Date.now() - Number(savedTimestamp);
+
+      if (elapsed < CART_EXPIRATION_MS) {
+        try {
+          setCart(JSON.parse(savedCart));
+        } catch {
+          // si el dato guardado estuviera corrupto, lo ignoramos
+        }
+      } else {
+        localStorage.removeItem(CART_KEY);
+        localStorage.removeItem(CART_TIMESTAMP_KEY);
       }
     }
 
@@ -34,11 +45,13 @@ export default function Home() {
 
   useEffect(() => {
     localStorage.setItem(CART_KEY, JSON.stringify(cart));
+    localStorage.setItem(CART_TIMESTAMP_KEY, String(Date.now()));
   }, [cart]);
 
   function handleOrderSent() {
     localStorage.setItem(ORDER_SENT_KEY, "true");
     localStorage.removeItem(CART_KEY);
+    localStorage.removeItem(CART_TIMESTAMP_KEY);
     setCart({});
     setOrderJustSent(true);
   }
