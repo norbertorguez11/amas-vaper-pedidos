@@ -11,12 +11,13 @@ type Props = {
 export default function SummaryScreen({ cart, onBack }: Props) {
   const [shopName, setShopName] = useState("");
   const [city, setCity] = useState("");
+  const [sending, setSending] = useState(false);
 
   const totalBoxes = Object.values(cart).reduce((a, b) => a + b, 0);
 
   let totalUnits = 0;
 
-  function sendWhatsApp() {
+  async function sendWhatsApp() {
     if (!shopName.trim()) {
       alert("Introduce el nombre del establecimiento.");
       return;
@@ -27,11 +28,15 @@ export default function SummaryScreen({ cart, onBack }: Props) {
       return;
     }
 
+    setSending(true);
+
     let totalUnitsMessage = 0;
 
     let message = `*${shopName.toUpperCase()}*%0A`;
     message += `${city}%0A%0A`;
     message += "━━━━━━━━━━━━━━%0A%0A";
+
+    const items: { producto: string; unidades: number }[] = [];
 
     catalog.forEach((category) => {
       const products = category.products.filter(
@@ -48,6 +53,8 @@ export default function SummaryScreen({ cart, onBack }: Props) {
 
         totalUnitsMessage += units;
 
+        items.push({ producto: product, unidades: units });
+
         message += `• ${product} × ${boxes} ${
           boxes === 1 ? "caja" : "cajas"
         } (${units} uds)%0A`;
@@ -58,6 +65,22 @@ export default function SummaryScreen({ cart, onBack }: Props) {
 
     message += "━━━━━━━━━━━━━━%0A%0A";
     message += `📦 *TOTAL:* ${totalBoxes} cajas · ${totalUnitsMessage} unidades`;
+
+    try {
+      const response = await fetch("/api/update-stock", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ items }),
+      });
+
+      if (!response.ok) {
+        console.error("No se pudo actualizar el stock en Google Sheets.");
+      }
+    } catch (error) {
+      console.error("Error de conexión al actualizar el stock:", error);
+    }
+
+    setSending(false);
 
     window.open(
       `https://wa.me/34744787695?text=${message}`,
@@ -161,9 +184,10 @@ export default function SummaryScreen({ cart, onBack }: Props) {
 
         <button
           onClick={sendWhatsApp}
-          className="mt-4 w-full rounded-xl bg-black py-4 text-white"
+          disabled={sending}
+          className="mt-4 w-full rounded-xl bg-black py-4 text-white disabled:opacity-50"
         >
-          Enviar pedido
+          {sending ? "Enviando..." : "Enviar pedido"}
         </button>
 
       </div>
