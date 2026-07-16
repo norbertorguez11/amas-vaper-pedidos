@@ -12,6 +12,7 @@ type Props = {
 export default function SummaryScreen({ cart, onBack, onOrderSent }: Props) {
   const [shopName, setShopName] = useState("");
   const [city, setCity] = useState("");
+  const [notes, setNotes] = useState("");
   const [sending, setSending] = useState(false);
 
   const totalBoxes = Object.values(cart).reduce((a, b) => a + b, 0);
@@ -63,6 +64,10 @@ export default function SummaryScreen({ cart, onBack, onOrderSent }: Props) {
 
       message += "%0A";
     });
+
+    if (notes.trim()) {
+      message += `📝 *Observaciones:* ${notes.trim()}%0A%0A`;
+    }
 
     message += "━━━━━━━━━━━━━━%0A%0A";
     message += `📦 *TOTAL:* ${totalBoxes} cajas · ${totalUnitsMessage} unidades`;
@@ -174,6 +179,14 @@ export default function SummaryScreen({ cart, onBack, onOrderSent }: Props) {
             value={city}
             onChange={(e) => setCity(e.target.value)}
             className="w-full rounded-xl border bg-white p-4"
+          />
+
+          <textarea
+            placeholder="Observaciones (opcional)"
+            value={notes}
+            onChange={(e) => setNotes(e.target.value)}
+            rows={3}
+            className="w-full rounded-xl border bg-white p-4 resize-none"
           />
 
         </div>
