@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import Image from "next/image";
 import { catalog } from "../data/catalog";
 import { normalizeName } from "../lib/normalize";
 import { getProductImagePath } from "../lib/productImage";
@@ -119,20 +120,19 @@ export default function OrderScreen({
                 return (
                   <div
                     key={product}
-                    className="rounded-xl bg-white shadow p-4 flex items-center justify-between gap-4"
+                    className="rounded-xl bg-white shadow p-4"
                   >
-                    <div className="flex items-center gap-4 min-w-0">
-                      <img
+                    <div className="flex items-center gap-4">
+                      <Image
                         src={getProductImagePath(product)}
                         alt={product}
+                        width={96}
+                        height={96}
                         className="w-24 h-24 rounded-lg object-cover flex-shrink-0"
-                        onError={(e) => {
-                          e.currentTarget.style.display = "none";
-                        }}
                       />
 
-                      <div className="min-w-0">
-                        <div className="font-medium truncate">
+                      <div className="min-w-0 flex-1">
+                        <div className="font-medium">
                           {product}
                         </div>
 
@@ -144,15 +144,15 @@ export default function OrderScreen({
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-3 flex-shrink-0">
+                    <div className="flex items-center justify-between gap-3 mt-4">
                       <button
                         onClick={() => remove(product)}
-                        className="w-8 h-8 rounded-full bg-gray-200"
+                        className="w-10 h-10 rounded-full bg-gray-200 flex-shrink-0"
                       >
                         -
                       </button>
 
-                      <div className="text-center min-w-[70px]">
+                      <div className="text-center flex-1">
                         <div className="font-semibold">
                           {cart[product] || 0}
                         </div>
@@ -165,7 +165,7 @@ export default function OrderScreen({
                       <button
                         onClick={() => add(product)}
                         disabled={sinStock || limiteAlcanzado}
-                        className={`w-8 h-8 rounded-full text-white ${
+                        className={`w-10 h-10 rounded-full text-white flex-shrink-0 ${
                           sinStock || limiteAlcanzado
                             ? "bg-gray-300"
                             : "bg-black"
