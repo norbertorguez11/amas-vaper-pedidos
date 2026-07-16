@@ -14,10 +14,10 @@ export default function HomeScreen({ onStart }: Props) {
         <Image
           src="/logo.png"
           alt="Logo Amás Vaper"
-          width={180}
-          height={180}
+          width={1645}
+          height={402}
           priority
-          className="mx-auto mb-6 w-[180px] h-auto"
+          className="mx-auto mb-6 w-full max-w-[400px] h-auto"
         />
 
         <h1 className="text-4xl font-bold text-gray-900">

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { catalog } from "../data/catalog";
+import Header from "./Header";
 
 type Props = {
   cart: Record<string, number>;
@@ -98,6 +99,7 @@ export default function SummaryScreen({ cart, onBack, onOrderSent }: Props) {
 
   return (
     <main className="min-h-screen bg-gray-100 p-5 pb-32">
+      <Header />
       <div className="mx-auto max-w-md">
 
         <h1 className="text-3xl font-bold mb-8">

@@ -3,6 +3,8 @@
 import { useEffect, useMemo, useState } from "react";
 import { catalog } from "../data/catalog";
 import { normalizeName } from "../lib/normalize";
+import { getProductImagePath } from "../lib/productImage";
+import Header from "./Header";
 
 type Cart = Record<string, number>;
 
@@ -84,6 +86,7 @@ export default function OrderScreen({
 
   return (
     <main className="min-h-screen bg-gray-100 pb-32">
+      <Header />
       <div className="mx-auto max-w-md p-5">
         <h1 className="text-3xl font-bold text-center">
           Nuevo pedido
@@ -116,21 +119,32 @@ export default function OrderScreen({
                 return (
                   <div
                     key={product}
-                    className="rounded-xl bg-white shadow p-4 flex items-center justify-between"
+                    className="rounded-xl bg-white shadow p-4 flex items-center justify-between gap-4"
                   >
-                    <div>
-                      <div className="font-medium">
-                        {product}
-                      </div>
+                    <div className="flex items-center gap-4 min-w-0">
+                      <img
+                        src={getProductImagePath(product)}
+                        alt={product}
+                        className="w-24 h-24 rounded-lg object-cover flex-shrink-0"
+                        onError={(e) => {
+                          e.currentTarget.style.display = "none";
+                        }}
+                      />
 
-                      {productStock && productStock.stock === 0 && (
-                        <p className="text-sm text-red-600 font-semibold mt-1">
-                          Stock no disponible
-                        </p>
-                      )}
+                      <div className="min-w-0">
+                        <div className="font-medium truncate">
+                          {product}
+                        </div>
+
+                        {productStock && productStock.stock === 0 && (
+                          <p className="text-sm text-red-600 font-semibold mt-1">
+                            Stock no disponible
+                          </p>
+                        )}
+                      </div>
                     </div>
 
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-3 flex-shrink-0">
                       <button
                         onClick={() => remove(product)}
                         className="w-8 h-8 rounded-full bg-gray-200"
