@@ -35,8 +35,8 @@ export default function SummaryScreen({ cart, onBack, onOrderSent }: Props) {
 
     let totalUnitsMessage = 0;
 
-    let message = `*${shopName.toUpperCase()}*%0A`;
-    message += `${city}%0A%0A`;
+    let message = `*${shopName.trim().toUpperCase()}*%0A`;
+    message += `${city.trim()}%0A%0A`;
     message += "━━━━━━━━━━━━━━%0A%0A";
 
     const items: { producto: string; unidades: number }[] = [];
