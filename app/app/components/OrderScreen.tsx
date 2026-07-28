@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
 import { catalog } from "../data/catalog";
 import { normalizeName } from "../lib/normalize";
@@ -28,6 +28,8 @@ export default function OrderScreen({
   onContinue,
 }: Props) {
   const [stock, setStock] = useState<StockProduct[]>([]);
+  const [hasReachedEnd, setHasReachedEnd] = useState(false);
+  const bottomMarkerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     async function loadStock() {
@@ -37,6 +39,24 @@ export default function OrderScreen({
     }
 
     loadStock();
+  }, []);
+
+  useEffect(() => {
+    const marker = bottomMarkerRef.current;
+    if (!marker) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          setHasReachedEnd(true);
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    observer.observe(marker);
+
+    return () => observer.disconnect();
   }, []);
 
   function getProductStock(product: string) {
@@ -84,6 +104,20 @@ export default function OrderScreen({
 
     return total;
   }, [cart]);
+
+  const canContinue = hasReachedEnd && totalBoxes >= 3;
+
+  let buttonText: string;
+
+  if (totalBoxes < 3) {
+    buttonText = `Añade ${3 - totalBoxes} caja${
+      3 - totalBoxes > 1 ? "s" : ""
+    } más`;
+  } else if (!hasReachedEnd) {
+    buttonText = "Desliza hacia abajo para terminar el pedido";
+  } else {
+    buttonText = `Continuar pedido (${totalBoxes} cajas · ${totalUnits} unidades)`;
+  }
 
   return (
     <main className="min-h-screen bg-gray-100 pb-32">
@@ -180,22 +214,20 @@ export default function OrderScreen({
             </div>
           </div>
         ))}
+
+        <div ref={bottomMarkerRef} className="h-1" />
       </div>
 
       <div className="fixed bottom-0 left-0 right-0 bg-white border-t p-4">
         <div className="mx-auto max-w-md">
           <button
             onClick={onContinue}
-            disabled={totalBoxes < 3}
+            disabled={!canContinue}
             className={`w-full rounded-xl py-4 font-semibold text-white ${
-              totalBoxes >= 3 ? "bg-black" : "bg-gray-400"
+              canContinue ? "bg-black" : "bg-gray-400"
             }`}
           >
-            {totalBoxes < 3
-              ? `Añade ${3 - totalBoxes} caja${
-                  3 - totalBoxes > 1 ? "s" : ""
-                } más`
-              : `Continuar pedido (${totalBoxes} cajas · ${totalUnits} unidades)`}
+            {buttonText}
           </button>
         </div>
       </div>

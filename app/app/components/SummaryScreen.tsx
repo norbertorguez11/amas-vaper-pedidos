@@ -31,6 +31,8 @@ export default function SummaryScreen({ cart, onBack, onOrderSent }: Props) {
       return;
     }
 
+    const whatsappWindow = window.open("", "_blank");
+
     setSending(true);
 
     let totalUnitsMessage = 0;
@@ -89,10 +91,13 @@ export default function SummaryScreen({ cart, onBack, onOrderSent }: Props) {
 
     setSending(false);
 
-    window.open(
-      `https://wa.me/34744787695?text=${message}`,
-      "_blank"
-    );
+    const whatsappUrl = `https://wa.me/34744787695?text=${message}`;
+
+    if (whatsappWindow) {
+      whatsappWindow.location.href = whatsappUrl;
+    } else {
+      window.open(whatsappUrl, "_blank");
+    }
 
     onOrderSent();
   }
