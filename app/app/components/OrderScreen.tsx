@@ -6,6 +6,7 @@ import { catalog } from "../data/catalog";
 import { normalizeName } from "../lib/normalize";
 import { getProductImagePath } from "../lib/productImage";
 import Header from "./Header";
+import Footer from "./Footer";
 
 type Cart = Record<string, number>;
 
@@ -216,6 +217,8 @@ export default function OrderScreen({
         ))}
 
         <div ref={bottomMarkerRef} className="h-1" />
+
+        <Footer />
       </div>
 
       <div className="fixed bottom-0 left-0 right-0 bg-white border-t p-4">

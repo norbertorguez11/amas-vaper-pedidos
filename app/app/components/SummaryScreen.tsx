@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { catalog } from "../data/catalog";
 import Header from "./Header";
+import Footer from "./Footer";
 
 type Props = {
   cart: Record<string, number>;
@@ -30,8 +31,6 @@ export default function SummaryScreen({ cart, onBack, onOrderSent }: Props) {
       alert("Introduce la localidad.");
       return;
     }
-
-    const whatsappWindow = window.open("", "_blank");
 
     setSending(true);
 
@@ -93,17 +92,13 @@ export default function SummaryScreen({ cart, onBack, onOrderSent }: Props) {
 
     const whatsappUrl = `https://wa.me/34744787695?text=${message}`;
 
-    if (whatsappWindow) {
-      whatsappWindow.location.href = whatsappUrl;
-    } else {
-      window.open(whatsappUrl, "_blank");
-    }
-
     onOrderSent();
+
+    window.location.href = whatsappUrl;
   }
 
   return (
-    <main className="min-h-screen bg-gray-100 p-5 pb-32">
+    <main className="min-h-screen bg-gray-100 p-5">
       <Header />
       <div className="mx-auto max-w-md">
 
@@ -214,6 +209,8 @@ export default function SummaryScreen({ cart, onBack, onOrderSent }: Props) {
         </button>
 
       </div>
+
+      <Footer />
     </main>
   );
 }
