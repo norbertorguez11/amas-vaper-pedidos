@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import Footer from "./Footer";
+import InstallButton from "./InstallButton";
 
 type Props = {
   onStart: () => void;
@@ -36,6 +37,8 @@ export default function HomeScreen({ onStart }: Props) {
           >
             Comenzar pedido
           </button>
+
+          <InstallButton />
 
         </div>
       </div>

@@ -15,6 +15,12 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "AMÁS VAPER - Haz tu pedido",
   description: "Haz tu pedido en AMÁS VAPER de forma rápida y sencilla.",
+  manifest: "/manifest.json",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "AMÁS VAPER",
+  },
   openGraph: {
     title: "Haz tu pedido en AMÁS VAPER",
     description: "La forma más rápida de hacer tu pedido.",
