@@ -58,11 +58,21 @@ export default function InstallButton() {
               Añadir a pantalla de inicio
             </h3>
 
-            <ol className="space-y-3 text-sm text-gray-700">
-              <li>1. Toca el botón compartir ⬆️ abajo en Safari</li>
-              <li>2. Desliza y toca "Añadir a pantalla de inicio"</li>
-              <li>3. ¡Listo! Ya tienes el acceso directo</li>
-            </ol>
+            <div className="mb-4">
+              <p className="font-semibold text-sm mb-2">Si usas Safari:</p>
+              <ol className="space-y-1 text-sm text-gray-700">
+                <li>1. Toca ⋯ (abajo) y luego Compartir ⬆️</li>
+                <li>2. Toca "Añadir a pantalla de inicio"</li>
+              </ol>
+            </div>
+
+            <div>
+              <p className="font-semibold text-sm mb-2">Si usas Chrome:</p>
+              <ol className="space-y-1 text-sm text-gray-700">
+                <li>1. Toca Compartir ⬆️ (arriba)</li>
+                <li>2. Toca "Añadir a pantalla de inicio"</li>
+              </ol>
+            </div>
 
             <button
               onClick={() => setShowIOSInstructions(false)}
